@@ -8,17 +8,17 @@ return new class extends Migration
 {
   public function up(): void
 {
-    Schema::create('blogs', function (Blueprint $table) {   // ← เติม s
+    Schema::create('blogs', function (Blueprint $table) {   
         $table->id();
         $table->string('title', 255);
         $table->text('content');
-        $table->string('status')->default('draft');          // ← จุดที่ 2 แก้ตรงนี้ด้วย
+        $table->boolean('status')->default(true);         
         $table->timestamps();
     });
 }
 
 public function down(): void
 {
-    Schema::dropIfExists('blogs');   // ← เติม s
+    Schema::dropIfExists('blogs');   
 }
 };

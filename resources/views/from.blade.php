@@ -1,119 +1,118 @@
-@extends('layout')
+@extends('layouts.app')
 
-@section('title', 'เขียนบทความใหม่')
+@section('title', 'เขียนบทความ')
 
 @section('content')
-    <style>
-        .form-card {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.08);
-            border: 1px solid #fce7ec;
-        }
+<div class="container page-container-md">
+    
+    <!-- เส้นป้ายบอกหมวดหมู่สไตล์โมเดิร์น -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <span class="category-tag">
+            Creator Studio
+        </span>
+        <div class="category-divider"></div>
+    </div>
 
-        .form-card h2 {
-            font-weight: 700;
-            color: #2b1d24;
-            margin-bottom: 30px;
-        }
+    <!-- หัวข้อหน้า -->
+    <div class="mb-4">
+        <h2 class="page-heading">เขียนบทความใหม่</h2>
+        <p class="page-description">สร้างสรรค์เนื้อหาใหม่และแบ่งปันเรื่องราวของคุณลงในระบบ</p>
+    </div>
 
-        .form-card h2::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-            margin: 12px auto 0;
-            border-radius: 2px;
-        }
+    <!-- แจ้งเตือนเมื่อบันทึกสำเร็จ (ดีไซน์มินิมอล) -->
+    @if(session('success'))
+        <div class="alert-success-custom">
+            <i class="bi bi-check-circle-fill alert-success-icon"></i>
+            <div class="alert-success-text">{{ session('success') }}</div>
+        </div>
+    @endif
 
-        .form-card label {
-            font-weight: 600;
-            color: #76646e;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .form-card .form-control {
-            border-radius: 10px;
-            border: 1px solid #fce7ec;
-            padding: 12px 14px;
-            transition: all 0.2s ease;
-        }
-
-        .form-card .form-control:focus {
-            border-color: #ec4899;
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-        }
-
-        .form-card textarea.form-control {
-            resize: vertical;
-        }
-
-        .form-card .text-danger {
-            font-size: 0.875rem;
-        }
-
-        .form-card .btn-primary {
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-            border: none;
-            border-radius: 10px;
-            padding: 10px 26px;
-            font-weight: 600;
-            transition: transform 0.15s ease;
-        }
-
-        .form-card .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.35);
-        }
-
-        .form-card .btn-secondary {
-            border-radius: 10px;
-            padding: 10px 26px;
-            font-weight: 600;
-            background: #fdf2f8;
-            border: 1px solid #fce7ec;
-            color: #76646e;
-        }
-
-        .form-card .btn-secondary:hover {
-            background: #fce7ec;
-            color: #2b1d24;
-        }
-    </style>
-
-    <div class="form-card">
-        <h2 class="text-center">เขียนบทความใหม่</h2>
-        <form method="POST" action="/insert">
+    <!-- กล่องฟอร์มสไตล์ Dashboard พรีเมียม -->
+    <div class="card-panel">
+        <form action="{{ route('insert') }}" method="POST">
             @csrf
-            <div class="form-group mb-3">
-                <label for="title">ชื่อบทความ</label>
-                <input type="text" name="title" class="form-control" placeholder="พิมพ์ชื่อบทความ...">
-            </div>
-            @error('title')
-                <div class="my-2">
-                    <span class="text-danger">{{ $message }}</span>
-                </div>
-            @enderror
 
-            <div class="form-group mb-3">
-                <label for="content">เนื้อหา</label>
-                <textarea name="content" cols="30" rows="6" class="form-control" placeholder="พิมพ์เนื้อหาบทความ..."></textarea>
-            </div>
-            @error('content')
-                <div class="my-2">
-                    <span class="text-danger">{{ $message }}</span>
+            <!-- ฟิลด์: ชื่อบทความ -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label form-label-custom mb-0">ชื่อบทความ</label>
+                    <small id="titleCounter" class="char-counter"></small>
                 </div>
-            @enderror
 
-            <div class="d-flex gap-2 mt-4">
-                <input type="submit" value="บันทึก" class="btn btn-primary">
-                <a href="/blog2" class="btn btn-secondary">บทความทั้งหมด</a>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    class="form-control custom-input @error('title') is-invalid @enderror"
+                    value="{{ old('title') }}"
+                    maxlength="150"
+                    placeholder="ตั้งชื่อหัวข้อบทความให้น่าสนใจ..."
+                    oninput="checkTitleLength()">
+
+                @error('title')
+                    <div class="invalid-feedback invalid-feedback-custom">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
+
+            <!-- ฟิลด์: เนื้อหา -->
+            <div class="mb-4">
+                <label class="form-label form-label-custom">เนื้อหาบทความ</label>
+
+                <textarea
+                    name="content"
+                    rows="7"
+                    class="form-control custom-textarea @error('content') is-invalid @enderror"
+                    placeholder="เริ่มเขียนเนื้อหารายละเอียดของบทความที่นี่...">{{ old('content') }}</textarea>
+
+                @error('content')
+                    <div class="invalid-feedback invalid-feedback-custom">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <!-- ปุ่มควบคุมด้านล่าง -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                <a href="{{ url('/blog') }}" class="btn-cancel">
+                    ยกเลิก
+                </a>
+                
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-file-earmark-check fs-5"></i> บันทึกบทความ
+                </button>
+            </div>
+
         </form>
     </div>
+</div>
+
+<script>
+    function checkTitleLength() {
+        const input = document.getElementById('title');
+        const counter = document.getElementById('titleCounter');
+        const length = input.value.length;
+        const limit = 50;
+
+        counter.textContent = length + ' / ' + limit;
+
+        if (length > limit) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            counter.style.color = '#dc2626';
+        } else if (length > 0) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            counter.style.color = '#16a34a';
+        } else {
+            input.classList.remove('is-invalid');
+            input.classList.remove('is-valid');
+            counter.style.color = '#94a3b8';
+        }
+    }
+
+    // เช็คทันทีตอนโหลดหน้า เผื่อมีค่าเก่าจาก old('title') ค้างอยู่
+    document.addEventListener('DOMContentLoaded', checkTitleLength);
+</script>
 @endsection
